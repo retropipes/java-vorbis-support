@@ -24,7 +24,6 @@ import com.github.trilarion.sound.vorbis.jcraft.jogg.Buffer;
  *
  */
 class Time0 extends FuncTime {
-
     private static final Logger LOG = Logger.getLogger(Time0.class.getName());
 
     @Override

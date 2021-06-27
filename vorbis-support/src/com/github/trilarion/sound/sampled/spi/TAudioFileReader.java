@@ -43,9 +43,8 @@ import javax.sound.sampled.spi.AudioFileReader;
  * @author Florian Bomers
  */
 public abstract class TAudioFileReader extends AudioFileReader {
-
-    private static final Logger LOG = Logger.getLogger(TAudioFileReader.class.getName());
-
+    private static final Logger LOG = Logger
+            .getLogger(TAudioFileReader.class.getName());
     private int m_nMarkLimit = -1;
     private final boolean m_bRereading;
 
@@ -73,20 +72,24 @@ public abstract class TAudioFileReader extends AudioFileReader {
      * this method unless there are really severe reasons. Normally, it is
      * sufficient to implement getAudioFileFormat(InputStream, long).
      *
-     * @param file	the file to read from.
-     * @return	an AudioFileFormat instance containing information from the
-     * header of the file passed in.
+     * @param file
+     *            the file to read from.
+     * @return an AudioFileFormat instance containing information from the
+     *         header of the file passed in.
      * @throws javax.sound.sampled.UnsupportedAudioFileException
      * @throws java.io.IOException
      */
     @Override
     public AudioFileFormat getAudioFileFormat(File file)
             throws UnsupportedAudioFileException, IOException {
-        LOG.log(Level.FINE, "TAudioFileReader.getAudioFileFormat(File): begin (class: {0})", getClass().getSimpleName());
+        LOG.log(Level.FINE,
+                "TAudioFileReader.getAudioFileFormat(File): begin (class: {0})",
+                getClass().getSimpleName());
         long lFileLengthInBytes = file.length();
         AudioFileFormat audioFileFormat;
         try (InputStream inputStream = new FileInputStream(file)) {
-            audioFileFormat = getAudioFileFormat(inputStream, lFileLengthInBytes);
+            audioFileFormat = getAudioFileFormat(inputStream,
+                    lFileLengthInBytes);
         }
         LOG.log(Level.FINE, "TAudioFileReader.getAudioFileFormat(File): end");
         return audioFileFormat;
@@ -98,20 +101,24 @@ public abstract class TAudioFileReader extends AudioFileReader {
      * this method unless there are really severe reasons. Normally, it is
      * sufficient to implement getAudioFileFormat(InputStream, long).
      *
-     * @param url	the URL to read from.
-     * @return	an AudioFileFormat instance containing information from the
-     * header of the URL passed in.
+     * @param url
+     *            the URL to read from.
+     * @return an AudioFileFormat instance containing information from the
+     *         header of the URL passed in.
      * @throws javax.sound.sampled.UnsupportedAudioFileException
      * @throws java.io.IOException
      */
     @Override
     public AudioFileFormat getAudioFileFormat(URL url)
             throws UnsupportedAudioFileException, IOException {
-        LOG.log(Level.FINE, "TAudioFileReader.getAudioFileFormat(URL): begin (class: {0})", getClass().getSimpleName());
+        LOG.log(Level.FINE,
+                "TAudioFileReader.getAudioFileFormat(URL): begin (class: {0})",
+                getClass().getSimpleName());
         long lFileLengthInBytes = getDataLength(url);
         AudioFileFormat audioFileFormat;
         try (InputStream inputStream = url.openStream()) {
-            audioFileFormat = getAudioFileFormat(inputStream, lFileLengthInBytes);
+            audioFileFormat = getAudioFileFormat(inputStream,
+                    lFileLengthInBytes);
         }
         LOG.log(Level.FINE, "TAudioFileReader.getAudioFileFormat(URL): end");
         return audioFileFormat;
@@ -123,16 +130,19 @@ public abstract class TAudioFileReader extends AudioFileReader {
      * this method unless there are really severe reasons. Normally, it is
      * sufficient to implement getAudioFileFormat(InputStream, long).
      *
-     * @param inputStream	the stream to read from.
-     * @return	an AudioFileFormat instance containing information from the
-     * header of the stream passed in.
+     * @param inputStream
+     *            the stream to read from.
+     * @return an AudioFileFormat instance containing information from the
+     *         header of the stream passed in.
      * @throws javax.sound.sampled.UnsupportedAudioFileException
      * @throws java.io.IOException
      */
     @Override
     public AudioFileFormat getAudioFileFormat(InputStream inputStream)
             throws UnsupportedAudioFileException, IOException {
-        LOG.log(Level.FINE, "TAudioFileReader.getAudioFileFormat(InputStream): begin (class: {0})", getClass().getSimpleName());
+        LOG.log(Level.FINE,
+                "TAudioFileReader.getAudioFileFormat(InputStream): begin (class: {0})",
+                getClass().getSimpleName());
         long lFileLengthInBytes = AudioSystem.NOT_SPECIFIED;
         if (!inputStream.markSupported()) {
             inputStream = new BufferedInputStream(inputStream, getMarkLimit());
@@ -140,15 +150,17 @@ public abstract class TAudioFileReader extends AudioFileReader {
         inputStream.mark(getMarkLimit());
         AudioFileFormat audioFileFormat;
         try {
-            audioFileFormat = getAudioFileFormat(inputStream, lFileLengthInBytes);
+            audioFileFormat = getAudioFileFormat(inputStream,
+                    lFileLengthInBytes);
         } finally {
-            /* TODO: required semantics is unclear: should reset()
-             be executed only when there is an exception or
-             should it be done always?
+            /*
+             * TODO: required semantics is unclear: should reset() be executed
+             * only when there is an exception or should it be done always?
              */
             inputStream.reset();
         }
-        LOG.log(Level.FINE, "TAudioFileReader.getAudioFileFormat(InputStream): end");
+        LOG.log(Level.FINE,
+                "TAudioFileReader.getAudioFileFormat(InputStream): end");
         return audioFileFormat;
     }
 
@@ -159,15 +171,17 @@ public abstract class TAudioFileReader extends AudioFileReader {
      * should not override getAudioInputStream(InputStream, long), too (see
      * comment there).
      *
-     * @param inputStream The InputStream to read from. It should be tested if
-     * it is markable. If not, and it is re-reading, wrap it into a
-     * BufferedInputStream with getMarkLimit() size.
-     * @param lFileLengthInBytes The size of the originating file, if known. If
-     * it isn't known, AudioSystem.NOT_SPECIFIED should be passed. This value
-     * may be used for byteLength in AudioFileFormat, if this value can't be
-     * derived from the informmation in the file header.
+     * @param inputStream
+     *            The InputStream to read from. It should be tested if it is
+     *            markable. If not, and it is re-reading, wrap it into a
+     *            BufferedInputStream with getMarkLimit() size.
+     * @param lFileLengthInBytes
+     *            The size of the originating file, if known. If it isn't known,
+     *            AudioSystem.NOT_SPECIFIED should be passed. This value may be
+     *            used for byteLength in AudioFileFormat, if this value can't be
+     *            derived from the informmation in the file header.
      * @return an AudioFileFormat instance containing information from the
-     * header of the stream passed in as inputStream.
+     *         header of the stream passed in as inputStream.
      * @throws javax.sound.sampled.UnsupportedAudioFileException
      * @throws java.io.IOException
      */
@@ -182,21 +196,25 @@ public abstract class TAudioFileReader extends AudioFileReader {
      * sufficient to implement getAudioFileFormat(InputStream, long) and perhaps
      * override getAudioInputStream(InputStream, long).
      *
-     * @param file	the File object to read from.
-     * @return	an AudioInputStream instance containing the audio data from this
-     * file.
+     * @param file
+     *            the File object to read from.
+     * @return an AudioInputStream instance containing the audio data from this
+     *         file.
      * @throws javax.sound.sampled.UnsupportedAudioFileException
      * @throws java.io.IOException
      */
     @Override
     public AudioInputStream getAudioInputStream(File file)
             throws UnsupportedAudioFileException, IOException {
-        LOG.log(Level.FINE, "TAudioFileReader.getAudioInputStream(File): begin (class: {0})", getClass().getSimpleName());
+        LOG.log(Level.FINE,
+                "TAudioFileReader.getAudioInputStream(File): begin (class: {0})",
+                getClass().getSimpleName());
         long lFileLengthInBytes = file.length();
         InputStream inputStream = new FileInputStream(file);
         AudioInputStream audioInputStream;
         try {
-            audioInputStream = getAudioInputStream(inputStream, lFileLengthInBytes);
+            audioInputStream = getAudioInputStream(inputStream,
+                    lFileLengthInBytes);
         } catch (UnsupportedAudioFileException | IOException e) {
             inputStream.close();
             throw e;
@@ -212,21 +230,25 @@ public abstract class TAudioFileReader extends AudioFileReader {
      * sufficient to implement getAudioFileFormat(InputStream, long) and perhaps
      * override getAudioInputStream(InputStream, long).
      *
-     * @param url	the URL to read from.
-     * @return	an AudioInputStream instance containing the audio data from this
-     * URL.
+     * @param url
+     *            the URL to read from.
+     * @return an AudioInputStream instance containing the audio data from this
+     *         URL.
      * @throws javax.sound.sampled.UnsupportedAudioFileException
      * @throws java.io.IOException
      */
     @Override
     public AudioInputStream getAudioInputStream(URL url)
             throws UnsupportedAudioFileException, IOException {
-        LOG.log(Level.FINE, "TAudioFileReader.getAudioInputStream(URL): begin (class: {0})", getClass().getSimpleName());
+        LOG.log(Level.FINE,
+                "TAudioFileReader.getAudioInputStream(URL): begin (class: {0})",
+                getClass().getSimpleName());
         long lFileLengthInBytes = getDataLength(url);
         InputStream inputStream = url.openStream();
         AudioInputStream audioInputStream = null;
         try {
-            audioInputStream = getAudioInputStream(inputStream, lFileLengthInBytes);
+            audioInputStream = getAudioInputStream(inputStream,
+                    lFileLengthInBytes);
         } catch (UnsupportedAudioFileException | IOException e) {
             inputStream.close();
             throw e;
@@ -242,16 +264,19 @@ public abstract class TAudioFileReader extends AudioFileReader {
      * sufficient to implement getAudioFileFormat(InputStream, long) and perhaps
      * override getAudioInputStream(InputStream, long).
      *
-     * @param inputStream	the stream to read from.
-     * @return	an AudioInputStream instance containing the audio data from this
-     * stream.
+     * @param inputStream
+     *            the stream to read from.
+     * @return an AudioInputStream instance containing the audio data from this
+     *         stream.
      * @throws javax.sound.sampled.UnsupportedAudioFileException
      * @throws java.io.IOException
      */
     @Override
     public AudioInputStream getAudioInputStream(InputStream inputStream)
             throws UnsupportedAudioFileException, IOException {
-        LOG.log(Level.FINE, "TAudioFileReader.getAudioInputStream(InputStream): begin (class: {0})", getClass().getSimpleName());
+        LOG.log(Level.FINE,
+                "TAudioFileReader.getAudioInputStream(InputStream): begin (class: {0})",
+                getClass().getSimpleName());
         long lFileLengthInBytes = AudioSystem.NOT_SPECIFIED;
         AudioInputStream audioInputStream = null;
         if (!inputStream.markSupported()) {
@@ -259,7 +284,8 @@ public abstract class TAudioFileReader extends AudioFileReader {
         }
         inputStream.mark(getMarkLimit());
         try {
-            audioInputStream = getAudioInputStream(inputStream, lFileLengthInBytes);
+            audioInputStream = getAudioInputStream(inputStream,
+                    lFileLengthInBytes);
         } catch (UnsupportedAudioFileException e) {
             inputStream.reset();
             throw e;
@@ -274,7 +300,8 @@ public abstract class TAudioFileReader extends AudioFileReader {
             }
             throw e;
         }
-        LOG.log(Level.FINE, "TAudioFileReader.getAudioInputStream(InputStream): end");
+        LOG.log(Level.FINE,
+                "TAudioFileReader.getAudioInputStream(InputStream): end");
         return audioInputStream;
     }
 
@@ -288,21 +315,25 @@ public abstract class TAudioFileReader extends AudioFileReader {
      * where the audio data starts. If this can't be realized for a certain
      * format, this method should be overridden.
      *
-     * @param inputStream The InputStream to read from. It should be tested if
-     * it is markable. If not, and it is re-reading, wrap it into a
-     * BufferedInputStream with getMarkLimit() size.
-     * @param lFileLengthInBytes The size of the originating file, if known. If
-     * it isn't known, AudioSystem.NOT_SPECIFIED should be passed. This value
-     * may be used for byteLength in AudioFileFormat, if this value can't be
-     * derived from the information in the file header.
+     * @param inputStream
+     *            The InputStream to read from. It should be tested if it is
+     *            markable. If not, and it is re-reading, wrap it into a
+     *            BufferedInputStream with getMarkLimit() size.
+     * @param lFileLengthInBytes
+     *            The size of the originating file, if known. If it isn't known,
+     *            AudioSystem.NOT_SPECIFIED should be passed. This value may be
+     *            used for byteLength in AudioFileFormat, if this value can't be
+     *            derived from the information in the file header.
      * @return
      * @throws javax.sound.sampled.UnsupportedAudioFileException
      * @throws java.io.IOException
      */
     protected AudioInputStream getAudioInputStream(InputStream inputStream,
-            long lFileLengthInBytes) throws UnsupportedAudioFileException,
-            IOException {
-        LOG.log(Level.FINE, "TAudioFileReader.getAudioInputStream(InputStream, long): begin (class: {0})", getClass().getSimpleName());
+            long lFileLengthInBytes)
+            throws UnsupportedAudioFileException, IOException {
+        LOG.log(Level.FINE,
+                "TAudioFileReader.getAudioInputStream(InputStream, long): begin (class: {0})",
+                getClass().getSimpleName());
         if (isRereading()) {
             if (!inputStream.markSupported()) {
                 inputStream = new BufferedInputStream(inputStream,
@@ -317,7 +348,8 @@ public abstract class TAudioFileReader extends AudioFileReader {
         }
         AudioInputStream audioInputStream = new AudioInputStream(inputStream,
                 audioFileFormat.getFormat(), audioFileFormat.getFrameLength());
-        LOG.log(Level.FINE, "TAudioFileReader.getAudioInputStream(InputStream, long): end");
+        LOG.log(Level.FINE,
+                "TAudioFileReader.getAudioInputStream(InputStream, long): end");
         return audioInputStream;
     }
 

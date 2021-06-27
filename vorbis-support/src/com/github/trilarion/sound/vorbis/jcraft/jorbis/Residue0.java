@@ -25,8 +25,8 @@ import com.github.trilarion.sound.vorbis.jcraft.jogg.Buffer;
  *
  */
 class Residue0 extends FuncResidue {
-
-    private static final Logger LOG = Logger.getLogger(Residue0.class.getName());
+    private static final Logger LOG = Logger
+            .getLogger(Residue0.class.getName());
 
     @Override
     void pack(Object vr, Buffer opb) {
@@ -34,17 +34,17 @@ class Residue0 extends FuncResidue {
         int acc = 0;
         opb.write(info.begin, 24);
         opb.write(info.end, 24);
-
-        opb.write(info.grouping - 1, 24); /* residue vectors to group and 
-         code with a partitioned book */
-
+        opb.write(info.grouping - 1, 24); /*
+                                           * residue vectors to group and code
+                                           * with a partitioned book
+                                           */
         opb.write(info.partitions - 1, 6); /* possible partition choices */
-
         opb.write(info.groupbook, 8); /* group huffman book */
-
-        /* secondstages is a bitmask; as encoding progresses pass by pass, a
-         bitmask of one indicates this partition class has bits to write
-         this pass */
+        /*
+         * secondstages is a bitmask; as encoding progresses pass by pass, a
+         * bitmask of one indicates this partition class has bits to write this
+         * pass
+         */
         for (int j = 0; j < info.partitions; j++) {
             int i = info.secondstages[j];
             if (Util.ilog(i) > 3) {
@@ -54,7 +54,6 @@ class Residue0 extends FuncResidue {
                 opb.write(i >>> 3, 5);
             } else {
                 opb.write(i, 4); /* trailing zero */
-
             }
             acc += Util.icount(i);
         }
@@ -72,7 +71,6 @@ class Residue0 extends FuncResidue {
         info.grouping = opb.read(24) + 1;
         info.partitions = opb.read(6) + 1;
         info.groupbook = opb.read(8);
-
         for (int j = 0; j < info.partitions; j++) {
             int cascade = opb.read(3);
             if (opb.read(1) != 0) {
@@ -81,16 +79,13 @@ class Residue0 extends FuncResidue {
             info.secondstages[j] = cascade;
             acc += Util.icount(cascade);
         }
-
         for (int j = 0; j < acc; j++) {
             info.booklist[j] = opb.read(8);
         }
-
         if (info.groupbook >= vi.books) {
             free_info(info);
             return (null);
         }
-
         for (int j = 0; j < acc; j++) {
             if (info.booklist[j] >= vi.books) {
                 free_info(info);
@@ -109,15 +104,11 @@ class Residue0 extends FuncResidue {
         int maxstage = 0;
         look.info = info;
         look.map = vm.mapping;
-
         look.parts = info.partitions;
         look.fullbooks = vd.fullbooks;
         look.phrasebook = vd.fullbooks[info.groupbook];
-
         dim = look.phrasebook.dim;
-
         look.partbooks = new int[look.parts][];
-
         for (int j = 0; j < look.parts; j++) {
             int i = info.secondstages[j];
             int stages = Util.ilog(i);
@@ -133,7 +124,6 @@ class Residue0 extends FuncResidue {
                 }
             }
         }
-
         look.partvals = (int) Math.rint(Math.pow(look.parts, dim));
         look.stages = maxstage;
         look.decodemap = new int[look.partvals][];
@@ -141,7 +131,6 @@ class Residue0 extends FuncResidue {
             int val = j;
             int mult = look.partvals / look.parts;
             look.decodemap[j] = new int[dim];
-
             for (int k = 0; k < dim; k++) {
                 int deco = val / mult;
                 val -= deco * mult;
@@ -160,35 +149,35 @@ class Residue0 extends FuncResidue {
     void free_look(Object i) {
     }
 
-    private static int[][][] _01inverse_partword = new int[2][][]; // _01inverse is synchronized for
+    private static int[][][] _01inverse_partword = new int[2][][]; // _01inverse
+                                                                   // is
+                                                                   // synchronized
+                                                                   // for
 
     // re-using partword
-    synchronized static int _01inverse(Block vb, Object vl, float[][] in, int ch,
-            int decodepart) {
+    synchronized static int _01inverse(Block vb, Object vl, float[][] in,
+            int ch, int decodepart) {
         int i, j, k, l, s;
         LookResidue0 look = (LookResidue0) vl;
         InfoResidue0 info = look.info;
-
         // move all this setup out later
         int samples_per_partition = info.grouping;
         int partitions_per_word = look.phrasebook.dim;
         int n = info.end - info.begin;
-
         int partvals = n / samples_per_partition;
-        int partwords = (partvals + partitions_per_word - 1) / partitions_per_word;
-
+        int partwords = (partvals + partitions_per_word - 1)
+                / partitions_per_word;
         if (_01inverse_partword.length < ch) {
             _01inverse_partword = new int[ch][][];
         }
-
         for (j = 0; j < ch; j++) {
-            if (_01inverse_partword[j] == null || _01inverse_partword[j].length < partwords) {
+            if (_01inverse_partword[j] == null
+                    || _01inverse_partword[j].length < partwords) {
                 _01inverse_partword[j] = new int[partwords][];
             }
         }
-
         for (s = 0; s < look.stages; s++) {
-            // each loop decodes on partition codeword containing 
+            // each loop decodes on partition codeword containing
             // partitions_pre_word partitions
             for (i = 0, l = 0; i < partvals; l++) {
                 if (s == 0) {
@@ -204,7 +193,6 @@ class Residue0 extends FuncResidue {
                         }
                     }
                 }
-
                 // now we decode residual values for the partitions
                 for (k = 0; k < partitions_per_word && i < partvals; k++, i++) {
                     for (j = 0; j < ch; j++) {
@@ -214,12 +202,14 @@ class Residue0 extends FuncResidue {
                             CodeBook stagebook = look.fullbooks[look.partbooks[index][s]];
                             if (stagebook != null) {
                                 if (decodepart == 0) {
-                                    if (stagebook.decodevs_add(in[j], offset, vb.opb,
+                                    if (stagebook.decodevs_add(in[j], offset,
+                                            vb.opb,
                                             samples_per_partition) == -1) {
                                         return (0);
                                     }
                                 } else if (decodepart == 1) {
-                                    if (stagebook.decodev_add(in[j], offset, vb.opb,
+                                    if (stagebook.decodev_add(in[j], offset,
+                                            vb.opb,
                                             samples_per_partition) == -1) {
                                         return (0);
                                     }
@@ -235,20 +225,20 @@ class Residue0 extends FuncResidue {
 
     static int[][] _2inverse_partword = null;
 
-    synchronized static int _2inverse(Block vb, Object vl, float[][] in, int ch) {
+    synchronized static int _2inverse(Block vb, Object vl, float[][] in,
+            int ch) {
         int i, k, l, s;
         LookResidue0 look = (LookResidue0) vl;
         InfoResidue0 info = look.info;
-
         // move all this setup out later
         int samples_per_partition = info.grouping;
         int partitions_per_word = look.phrasebook.dim;
         int n = info.end - info.begin;
-
         int partvals = n / samples_per_partition;
-        int partwords = (partvals + partitions_per_word - 1) / partitions_per_word;
-
-        if (_2inverse_partword == null || _2inverse_partword.length < partwords) {
+        int partwords = (partvals + partitions_per_word - 1)
+                / partitions_per_word;
+        if (_2inverse_partword == null
+                || _2inverse_partword.length < partwords) {
             _2inverse_partword = new int[partwords][];
         }
         for (s = 0; s < look.stages; s++) {
@@ -264,7 +254,6 @@ class Residue0 extends FuncResidue {
                         return (0);
                     }
                 }
-
                 // now we decode residual values for the partitions
                 for (k = 0; k < partitions_per_word && i < partvals; k++, i++) {
                     int offset = info.begin + i * samples_per_partition;
@@ -300,42 +289,34 @@ class Residue0 extends FuncResidue {
     }
 
     static class LookResidue0 {
-
         InfoResidue0 info;
         int map;
-
         int parts;
         int stages;
         CodeBook[] fullbooks;
         CodeBook phrasebook;
         int[][] partbooks;
-
         int partvals;
         int[][] decodemap;
-
         int postbits;
         int phrasebits;
         int frames;
     }
 
     static class InfoResidue0 {
-
         // block-partitioned VQ coded straight residue
         int begin;
         int end;
-
         // first stage (lossless partitioning)
         int grouping; // group n vectors per partition
         int partitions; // possible codebooks for a partition
         int groupbook; // huffbook for partitioning
         int[] secondstages = new int[64]; // expanded out to pointers in lookup
         int[] booklist = new int[256]; // list of second stage books
-
         // encode-only heuristic settings
         float[] entmax = new float[64]; // book entropy threshholds
         float[] ampmax = new float[64]; // book amp threshholds
         int[] subgrp = new int[64]; // book heuristic subgroup size
         int[] blimit = new int[64]; // subgroup position limits
     }
-
 }

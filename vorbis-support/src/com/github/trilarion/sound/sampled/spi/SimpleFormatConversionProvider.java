@@ -38,13 +38,17 @@ import com.github.trilarion.sound.sampled.AudioFormats;
  * @author Matthias Pfisterer
  */
 // todo:
-// - declare a constant ALL_BUT_SAME_VALUE (==-2) or so that can be used in format lists
-// - consistent implementation of replacing NOT_SPECIFIED when not given in conversion
-public abstract class SimpleFormatConversionProvider extends TFormatConversionProvider {
+// - declare a constant ALL_BUT_SAME_VALUE (==-2) or so that can be used in
+// format lists
+// - consistent implementation of replacing NOT_SPECIFIED when not given in
+// conversion
+public abstract class SimpleFormatConversionProvider
+        extends TFormatConversionProvider {
+    private static final Logger LOG = Logger
+            .getLogger(SimpleFormatConversionProvider.class.getName());
 
-    private static final Logger LOG = Logger.getLogger(SimpleFormatConversionProvider.class.getName());
-
-    private static void collectEncodings(Collection<AudioFormat> formats, Collection<AudioFormat.Encoding> encodings) {
+    private static void collectEncodings(Collection<AudioFormat> formats,
+            Collection<AudioFormat.Encoding> encodings) {
         for (AudioFormat format : formats) {
             encodings.add(format.getEncoding());
         }
@@ -89,13 +93,15 @@ public abstract class SimpleFormatConversionProvider extends TFormatConversionPr
 
     // overwritten of FormatConversionProvider
     @Override
-    public boolean isSourceEncodingSupported(AudioFormat.Encoding sourceEncoding) {
+    public boolean isSourceEncodingSupported(
+            AudioFormat.Encoding sourceEncoding) {
         return m_sourceEncodings.contains(sourceEncoding);
     }
 
     // overwritten of FormatConversionProvider
     @Override
-    public boolean isTargetEncodingSupported(AudioFormat.Encoding targetEncoding) {
+    public boolean isTargetEncodingSupported(
+            AudioFormat.Encoding targetEncoding) {
         return m_targetEncodings.contains(targetEncoding);
     }
 
@@ -126,7 +132,8 @@ public abstract class SimpleFormatConversionProvider extends TFormatConversionPr
      * @return
      */
     @Override
-    public AudioFormat[] getTargetFormats(AudioFormat.Encoding targetEncoding, AudioFormat sourceFormat) {
+    public AudioFormat[] getTargetFormats(AudioFormat.Encoding targetEncoding,
+            AudioFormat sourceFormat) {
         if (isConversionSupported(targetEncoding, sourceFormat)) {
             return m_targetFormats.toArray(EMPTY_FORMAT_ARRAY);
         } else {
@@ -147,5 +154,4 @@ public abstract class SimpleFormatConversionProvider extends TFormatConversionPr
         }
         return false;
     }
-
 }

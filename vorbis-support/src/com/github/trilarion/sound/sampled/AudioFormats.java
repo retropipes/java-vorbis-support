@@ -26,13 +26,12 @@ import javax.sound.sampled.AudioSystem;
  *
  */
 public final class AudioFormats {
-
-    private static final Logger LOG = Logger.getLogger(AudioFormats.class.getName());
+    private static final Logger LOG = Logger
+            .getLogger(AudioFormats.class.getName());
 
     private static boolean doMatch(int i1, int i2) {
         return i1 == AudioSystem.NOT_SPECIFIED
-                || i2 == AudioSystem.NOT_SPECIFIED
-                || i1 == i2;
+                || i2 == AudioSystem.NOT_SPECIFIED || i1 == i2;
     }
 
     private static boolean doMatch(float f1, float f2) {
@@ -48,13 +47,14 @@ public final class AudioFormats {
      * Exceptions:
      * <ul>
      * <li>Encoding must always be equal for a match.
-     * <li> For a match, endianness must be equal if SampleSizeInBits is not
+     * <li>For a match, endianness must be equal if SampleSizeInBits is not
      * AudioSystem.NOT_SPECIFIED and greater than 8bit in both formats.<br>
      * In other words: If SampleSizeInBits is AudioSystem.NOT_SPECIFIED in
-     * either format or both formats have a SampleSizeInBits smaller than 8, endianness does
-     * not matter. </ul> This is a proposition to be used as
-     * AudioFormat.matches. It can therefore be considered as a temporary
-     * workaround.
+     * either format or both formats have a SampleSizeInBits smaller than 8,
+     * endianness does not matter.
+     * </ul>
+     * This is a proposition to be used as AudioFormat.matches. It can therefore
+     * be considered as a temporary workaround.
      *
      * @param format1
      * @param format2
@@ -62,9 +62,8 @@ public final class AudioFormats {
      */
     // IDEA: create a special "NOT_SPECIFIED" encoding
     // and a AudioFormat.Encoding.matches method.
-    public static boolean matches(AudioFormat format1,
-                                  AudioFormat format2) {
-        //$$fb 19 Dec 99: endian must be checked, too.
+    public static boolean matches(AudioFormat format1, AudioFormat format2) {
+        // $$fb 19 Dec 99: endian must be checked, too.
         //
         // we do have a problem with redundant elements:
         // e.g.
@@ -76,17 +75,20 @@ public final class AudioFormats {
         // redundancies and implicit definitions
         //
         // As a workaround of this issue I return in the converters
-        // all combinations, e.g. for ULAW I return bigEndian and !bigEndian formats.
-        /* old version
+        // all combinations, e.g. for ULAW I return bigEndian and !bigEndian
+        // formats.
+        /*
+         * old version
          */
         // as proposed by florian
-        return format1.getEncoding().equals(format2.getEncoding())
-                && (format2.getSampleSizeInBits() <= 8
+        return format1.getEncoding().equals(format2.getEncoding()) && (format2
+                .getSampleSizeInBits() <= 8
                 || format1.getSampleSizeInBits() == AudioSystem.NOT_SPECIFIED
                 || format2.getSampleSizeInBits() == AudioSystem.NOT_SPECIFIED
                 || format1.isBigEndian() == format2.isBigEndian())
                 && doMatch(format1.getChannels(), format2.getChannels())
-                && doMatch(format1.getSampleSizeInBits(), format2.getSampleSizeInBits())
+                && doMatch(format1.getSampleSizeInBits(),
+                        format2.getSampleSizeInBits())
                 && doMatch(format1.getFrameSize(), format2.getFrameSize())
                 && doMatch(format1.getSampleRate(), format2.getSampleRate())
                 && doMatch(format1.getFrameRate(), format2.getFrameRate());

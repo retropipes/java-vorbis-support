@@ -23,8 +23,8 @@ import java.util.logging.Logger;
  *
  */
 class Residue1 extends Residue0 {
-
-    private static final Logger LOG = Logger.getLogger(Residue1.class.getName());
+    private static final Logger LOG = Logger
+            .getLogger(Residue1.class.getName());
 
     @Override
     int inverse(Block vb, Object vl, float[][] in, int[] nonzero, int ch) {

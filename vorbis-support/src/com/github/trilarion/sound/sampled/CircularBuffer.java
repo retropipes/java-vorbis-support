@@ -25,9 +25,8 @@ import java.util.logging.Logger;
  * @author
  */
 public class CircularBuffer {
-
-    private static final Logger LOG = Logger.getLogger(CircularBuffer.class.getName());
-
+    private static final Logger LOG = Logger
+            .getLogger(CircularBuffer.class.getName());
     private final boolean m_bBlockingRead;
     private final boolean m_bBlockingWrite;
     private final byte[] m_abData;
@@ -38,15 +37,13 @@ public class CircularBuffer {
     private boolean m_bOpen;
 
     /**
-     *  Listener
+     * Listener
      */
     public interface BufferListener {
-
         /**
          * Data is ready.
          */
         void dataReady();
-
     }
 
     /**
@@ -56,7 +53,8 @@ public class CircularBuffer {
      * @param bBlockingWrite
      * @param trigger
      */
-    public CircularBuffer(int nSize, boolean bBlockingRead, boolean bBlockingWrite, BufferListener trigger) {
+    public CircularBuffer(int nSize, boolean bBlockingRead,
+            boolean bBlockingWrite, BufferListener trigger) {
         m_bBlockingRead = bBlockingRead;
         m_bBlockingWrite = bBlockingWrite;
         m_nSize = nSize;
@@ -119,7 +117,8 @@ public class CircularBuffer {
         if (!isOpen()) {
             if (availableRead() > 0) {
                 nLength = Math.min(nLength, availableRead());
-                LOG.log(Level.FINE, "reading rest in closed buffer, length: {0}", nLength);
+                LOG.log(Level.FINE,
+                        "reading rest in closed buffer, length: {0}", nLength);
             } else {
                 LOG.log(Level.FINE, "< not open. returning -1.");
                 return -1;
@@ -145,7 +144,8 @@ public class CircularBuffer {
                 int nAvailable = Math.min(availableRead(), nRemainingBytes);
                 while (nAvailable > 0) {
                     int nToRead = Math.min(nAvailable, m_nSize - getReadPos());
-                    System.arraycopy(m_abData, getReadPos(), abData, nOffset, nToRead);
+                    System.arraycopy(m_abData, getReadPos(), abData, nOffset,
+                            nToRead);
                     m_lReadPos += nToRead;
                     nOffset += nToRead;
                     nAvailable -= nToRead;
@@ -168,7 +168,8 @@ public class CircularBuffer {
      * @return
      */
     public int write(byte[] abData, int nOffset, int nLength) {
-        LOG.log(Level.FINE, ">TCircularBuffer.write(): called; nLength: {0}", nLength);
+        LOG.log(Level.FINE, ">TCircularBuffer.write(): called; nLength: {0}",
+                nLength);
         dumpInternalState();
         synchronized (this) {
             LOG.log(Level.FINE, "entered synchronized block.");
@@ -186,9 +187,13 @@ public class CircularBuffer {
                 }
                 int nAvailable = Math.min(availableWrite(), nRemainingBytes);
                 while (nAvailable > 0) {
-                    int nToWrite = Math.min(nAvailable, m_nSize - getWritePos());
-                    //TDebug.out("src buf size= " + abData.length + ", offset = " + nOffset + ", dst buf size=" + m_abData.length + " write pos=" + getWritePos() + " len=" + nToWrite);
-                    System.arraycopy(abData, nOffset, m_abData, getWritePos(), nToWrite);
+                    int nToWrite = Math.min(nAvailable,
+                            m_nSize - getWritePos());
+                    // TDebug.out("src buf size= " + abData.length + ", offset =
+                    // " + nOffset + ", dst buf size=" + m_abData.length + "
+                    // write pos=" + getWritePos() + " len=" + nToWrite);
+                    System.arraycopy(abData, nOffset, m_abData, getWritePos(),
+                            nToWrite);
                     m_lWritePos += nToWrite;
                     nOffset += nToWrite;
                     nAvailable -= nToWrite;
@@ -204,8 +209,10 @@ public class CircularBuffer {
     }
 
     private void dumpInternalState() {
-        LOG.log(Level.FINE, "m_lReadPos  = {0} ^= {1}", new Object[]{m_lReadPos, getReadPos()});
-        LOG.log(Level.FINE, "m_lWritePos = {0} ^= {1}", new Object[]{m_lWritePos, getWritePos()});
+        LOG.log(Level.FINE, "m_lReadPos  = {0} ^= {1}",
+                new Object[] { m_lReadPos, getReadPos() });
+        LOG.log(Level.FINE, "m_lWritePos = {0} ^= {1}",
+                new Object[] { m_lWritePos, getWritePos() });
         LOG.log(Level.FINE, "availableRead()  = {0}", availableRead());
         LOG.log(Level.FINE, "availableWrite() = {0}", availableWrite());
     }

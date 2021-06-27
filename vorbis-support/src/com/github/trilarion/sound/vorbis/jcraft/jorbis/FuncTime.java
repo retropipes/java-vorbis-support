@@ -24,10 +24,9 @@ import com.github.trilarion.sound.vorbis.jcraft.jogg.Buffer;
  *
  */
 abstract class FuncTime {
-
-    private static final Logger LOG = Logger.getLogger(FuncTime.class.getName());
-
-    public static FuncTime[] time_P = {new Time0()};
+    private static final Logger LOG = Logger
+            .getLogger(FuncTime.class.getName());
+    public static FuncTime[] time_P = { new Time0() };
 
     abstract void pack(Object i, Buffer opb);
 

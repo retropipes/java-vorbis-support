@@ -24,10 +24,9 @@ import com.github.trilarion.sound.vorbis.jcraft.jogg.Buffer;
  *
  */
 abstract class FuncMapping {
-
-    private static final Logger LOG = Logger.getLogger(FuncMapping.class.getName());
-
-    public static FuncMapping[] mapping_P = {new Mapping0()};
+    private static final Logger LOG = Logger
+            .getLogger(FuncMapping.class.getName());
+    public static FuncMapping[] mapping_P = { new Mapping0() };
 
     abstract void pack(Info info, Object imap, Buffer buffer);
 

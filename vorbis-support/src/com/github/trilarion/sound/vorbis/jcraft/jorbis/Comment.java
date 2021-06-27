@@ -26,30 +26,24 @@ import com.github.trilarion.sound.vorbis.jcraft.jogg.Packet;
  * storage.
  */
 public class Comment {
-
     private static final Logger LOG = Logger.getLogger(Comment.class.getName());
-
     private static final byte[] _vorbis = "vorbis".getBytes();
-    private static final byte[] _vendor = "Xiphophorus libVorbis I 20000508".getBytes();
-
+    private static final byte[] _vendor = "Xiphophorus libVorbis I 20000508"
+            .getBytes();
     private static final int OV_EIMPL = -130;
-
     // unlimited user comment fields.
     /**
      *
      */
     public byte[][] user_comments;
-
     /**
      *
      */
     public int[] comment_lengths;
-
     /**
      *
      */
     public int comments;
-
     /**
      *
      */
@@ -78,13 +72,11 @@ public class Comment {
             System.arraycopy(user_comments, 0, foo, 0, comments);
         }
         user_comments = foo;
-
         int[] goo = new int[comments + 2];
         if (comment_lengths != null) {
             System.arraycopy(comment_lengths, 0, goo, 0, comments);
         }
         comment_lengths = goo;
-
         byte[] bar = new byte[comment.length + 1];
         System.arraycopy(comment, 0, bar, 0, comment.length);
         user_comments[comments] = bar;
@@ -148,7 +140,8 @@ public class Comment {
         byte[] comment = user_comments[foo];
         for (int i = 0; i < comment_lengths[foo]; i++) {
             if (comment[i] == '=') {
-                return new String(comment, i + 1, comment_lengths[foo] - (i + 1));
+                return new String(comment, i + 1,
+                        comment_lengths[foo] - (i + 1));
             }
         }
         return null;
@@ -161,12 +154,11 @@ public class Comment {
         byte[] fulltag = new byte[fulltaglen];
         System.arraycopy(tag, 0, fulltag, 0, tag.length);
         fulltag[tag.length] = (byte) '=';
-
         for (i = 0; i < comments; i++) {
             if (tagcompare(user_comments[i], fulltag, fulltaglen)) {
                 if (count == found) {
                     // We return a pointer to the data, not a copy
-                    //return user_comments[i] + taglen + 1;
+                    // return user_comments[i] + taglen + 1;
                     return i;
                 } else {
                     found++;
@@ -191,7 +183,6 @@ public class Comment {
         }
         user_comments = new byte[comments + 1][];
         comment_lengths = new int[comments + 1];
-
         for (int i = 0; i < comments; i++) {
             int len = opb.read(32);
             if (len < 0) {
@@ -205,7 +196,6 @@ public class Comment {
         if (opb.read(1) != 1) {
             clear();
             return (-1);
-
         }
         return (0);
     }
@@ -214,11 +204,9 @@ public class Comment {
         // preamble
         opb.write(0x03, 8);
         opb.write(_vorbis);
-
         // vendor
         opb.write(_vendor.length, 32);
         opb.write(_vendor);
-
         // comments
         opb.write(comments, 32);
         if (comments != 0) {
@@ -243,11 +231,9 @@ public class Comment {
     public int header_out(Packet op) {
         Buffer opb = new Buffer();
         opb.writeinit();
-
         if (pack(opb) != 0) {
             return OV_EIMPL;
         }
-
         op.packet_base = new byte[opb.bytes()];
         op.packet = 0;
         op.bytes = opb.bytes();
@@ -290,8 +276,8 @@ public class Comment {
     public String toString() {
         String foo = "Vendor: " + new String(vendor, 0, vendor.length - 1);
         for (int i = 0; i < comments; i++) {
-            foo = foo + "\nComment: "
-                    + new String(user_comments[i], 0, user_comments[i].length - 1);
+            foo = foo + "\nComment: " + new String(user_comments[i], 0,
+                    user_comments[i].length - 1);
         }
         foo = foo + "\n";
         return foo;

@@ -29,9 +29,7 @@ import java.util.logging.Logger;
  http://www2.xtdl.com/~rothwlr/lsfpaper/lsfpage.html 
  ********************************************************************/
 final class Lsp {
-
     private static final Logger LOG = Logger.getLogger(Lsp.class.getName());
-
     static final float M_PI = (float) (3.1415926539);
 
     static void lsp_to_curve(float[] curve, int[] map, int n, int ln,
@@ -42,19 +40,16 @@ final class Lsp {
             lsp[i] = Lookup.coslook(lsp[i]);
         }
         int m2 = (m / 2) * 2;
-
         i = 0;
         while (i < n) {
             int k = map[i];
             float p = .7071067812f;
             float q = .7071067812f;
             float w = Lookup.coslook(wdel * k);
-
             for (int j = 0; j < m2; j += 2) {
                 q *= lsp[j] - w;
                 p *= lsp[j + 1] - w;
             }
-
             if ((m & 1) != 0) {
                 /* odd order filter; slightly assymetric */
                 /* the last coefficient */
@@ -66,13 +61,11 @@ final class Lsp {
                 q *= q * (1.f + w);
                 p *= p * (1.f - w);
             }
-
-            //  q=frexp(p+q,&qexp);
+            // q=frexp(p+q,&qexp);
             q = p + q;
             int hx = Float.floatToIntBits(q);
             int ix = 0x7fffffff & hx;
             int qexp = 0;
-
             if (ix >= 0x7f800000 || (ix == 0)) {
                 // 0,inf,nan
             } else {
@@ -86,14 +79,12 @@ final class Lsp {
                 hx = (hx & 0x807fffff) | 0x3f000000;
                 q = Float.intBitsToFloat(hx);
             }
-
-            q = Lookup.fromdBlook(amp * Lookup.invsqlook(q) * Lookup.invsq2explook(qexp + m)
-                    - ampoffset);
-
+            q = Lookup.fromdBlook(
+                    amp * Lookup.invsqlook(q) * Lookup.invsq2explook(qexp + m)
+                            - ampoffset);
             do {
                 curve[i++] *= q;
             } while (i < n && map[i] == k);
-
         }
     }
 }

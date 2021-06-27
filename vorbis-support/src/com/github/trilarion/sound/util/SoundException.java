@@ -22,7 +22,6 @@ import java.util.logging.Logger;
  *
  */
 public class SoundException extends Exception {
-
     /**
      * Only a constructor with a string argument to force users to give
      * meaningful messages.
@@ -33,5 +32,6 @@ public class SoundException extends Exception {
         super("Vorbis exception " + s);
     }
 
-    private static final Logger LOG = Logger.getLogger(SoundException.class.getName());
+    private static final Logger LOG = Logger
+            .getLogger(SoundException.class.getName());
 }

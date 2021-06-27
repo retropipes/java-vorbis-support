@@ -22,13 +22,11 @@ import com.github.trilarion.sound.util.Util;
 import com.github.trilarion.sound.vorbis.jcraft.jogg.Buffer;
 
 class CodeBook {
-
-    private static final Logger LOG = Logger.getLogger(CodeBook.class.getName());
-
+    private static final Logger LOG = Logger
+            .getLogger(CodeBook.class.getName());
     int dim; // codebook dimensions (elements per vector)
     int entries; // codebook entries
     StaticCodeBook c = new StaticCodeBook();
-
     float[] valuelist; // list of dim*entries actual entry values
     int[] codelist; // list of bitstream codewords for each entry
     DecodeAux decode_tree;
@@ -41,14 +39,14 @@ class CodeBook {
 
     // One the encode side, our vector writers are each designed for a
     // specific purpose, and the encoder is not flexible without modification:
-    // 
+    //
     // The LSP vector coder uses a single stage nearest-match with no
-    // interleave, so no step and no error return.  This is specced by floor0
+    // interleave, so no step and no error return. This is specced by floor0
     // and doesn't change.
-    // 
+    //
     // Residue0 encoding interleaves, uses multiple stages, and each stage
     // peels of a specific amount of resolution from a lattice (thus we want
-    // to match by threshhold, not nearest match).  Residue doesn't *have* to
+    // to match by threshhold, not nearest match). Residue doesn't *have* to
     // be encoded that way, but to change it, one will need to add more
     // infrastructure on the encode side (decode side is specced and simpler)
     // floor0 LSP (single stage, non interleaved, nearest match)
@@ -76,17 +74,16 @@ class CodeBook {
         return (encode(best, b));
     }
 
-    private int[] t = new int[15]; // decodevs_add is synchronized for re-using t.
+    private int[] t = new int[15]; // decodevs_add is synchronized for re-using
+                                   // t.
 
     synchronized int decodevs_add(float[] a, int offset, Buffer b, int n) {
         int step = n / dim;
         int entry;
         int i, j, o;
-
         if (t.length < step) {
             t = new int[step];
         }
-
         for (i = 0; i < step; i++) {
             entry = decode(b);
             if (entry == -1) {
@@ -99,14 +96,12 @@ class CodeBook {
                 a[offset + o + j] += valuelist[t[j] + i];
             }
         }
-
         return (0);
     }
 
     int decodev_add(float[] a, int offset, Buffer b, int n) {
         int i, j, entry;
         int t;
-
         if (dim > 8) {
             for (i = 0; i < n;) {
                 entry = decode(b);
@@ -127,24 +122,24 @@ class CodeBook {
                 t = entry * dim;
                 j = 0;
                 switch (dim) {
-                    case 8:
-                        a[offset + (i++)] += valuelist[t + (j++)];
-                    case 7:
-                        a[offset + (i++)] += valuelist[t + (j++)];
-                    case 6:
-                        a[offset + (i++)] += valuelist[t + (j++)];
-                    case 5:
-                        a[offset + (i++)] += valuelist[t + (j++)];
-                    case 4:
-                        a[offset + (i++)] += valuelist[t + (j++)];
-                    case 3:
-                        a[offset + (i++)] += valuelist[t + (j++)];
-                    case 2:
-                        a[offset + (i++)] += valuelist[t + (j++)];
-                    case 1:
-                        a[offset + (i++)] += valuelist[t + (j++)];
-                    case 0:
-                        break;
+                case 8:
+                    a[offset + (i++)] += valuelist[t + (j++)];
+                case 7:
+                    a[offset + (i++)] += valuelist[t + (j++)];
+                case 6:
+                    a[offset + (i++)] += valuelist[t + (j++)];
+                case 5:
+                    a[offset + (i++)] += valuelist[t + (j++)];
+                case 4:
+                    a[offset + (i++)] += valuelist[t + (j++)];
+                case 3:
+                    a[offset + (i++)] += valuelist[t + (j++)];
+                case 2:
+                    a[offset + (i++)] += valuelist[t + (j++)];
+                case 1:
+                    a[offset + (i++)] += valuelist[t + (j++)];
+                case 0:
+                    break;
                 }
             }
         }
@@ -154,7 +149,6 @@ class CodeBook {
     int decodev_set(float[] a, int offset, Buffer b, int n) {
         int i, j, entry;
         int t;
-
         for (i = 0; i < n;) {
             entry = decode(b);
             if (entry == -1) {
@@ -171,13 +165,11 @@ class CodeBook {
     int decodevv_add(float[][] a, int offset, int ch, Buffer b, int n) {
         int i, j, entry;
         int chptr = 0;
-
         for (i = offset / ch; i < (offset + n) / ch;) {
             entry = decode(b);
             if (entry == -1) {
                 return (-1);
             }
-
             int t = entry * dim;
             for (j = 0; j < dim; j++) {
                 a[chptr++][i] += valuelist[t + j];
@@ -191,15 +183,15 @@ class CodeBook {
     }
 
     // Decode side is specced and easier, because we don't need to find
-    // matches using different criteria; we simply read and map.  There are
+    // matches using different criteria; we simply read and map. There are
     // two things we need to do 'depending':
-    //   
-    // We may need to support interleave.  We don't really, but it's
+    //
+    // We may need to support interleave. We don't really, but it's
     // convenient to do it here rather than rebuild the vector later.
     //
     // Cascades may be additive or multiplicitive; this is not inherent in
-    // the codebook, but set in the code using the codebook.  Like
-    // interleaving, it's easiest to do it here.  
+    // the codebook, but set in the code using the codebook. Like
+    // interleaving, it's easiest to do it here.
     // stage==0 -> declarative (set the value)
     // stage==1 -> additive
     // stage==2 -> multiplicitive
@@ -208,7 +200,6 @@ class CodeBook {
         int ptr = 0;
         DecodeAux t = decode_tree;
         int lok = b.look(t.tabn);
-
         if (lok >= 0) {
             ptr = t.tab[lok];
             b.adv(t.tabl[lok]);
@@ -218,15 +209,15 @@ class CodeBook {
         }
         do {
             switch (b.read1()) {
-                case 0:
-                    ptr = t.ptr0[ptr];
-                    break;
-                case 1:
-                    ptr = t.ptr1[ptr];
-                    break;
-                case -1:
-                default:
-                    return (-1);
+            case 0:
+                ptr = t.ptr0[ptr];
+                break;
+            case 1:
+                ptr = t.ptr1[ptr];
+                break;
+            case -1:
+            default:
+                return (-1);
             }
         } while (ptr > 0);
         return (-ptr);
@@ -239,23 +230,23 @@ class CodeBook {
             return (-1);
         }
         switch (addmul) {
-            case -1:
-                for (int i = 0, o = 0; i < dim; i++, o += step) {
-                    a[index + o] = valuelist[entry * dim + i];
-                }
-                break;
-            case 0:
-                for (int i = 0, o = 0; i < dim; i++, o += step) {
-                    a[index + o] += valuelist[entry * dim + i];
-                }
-                break;
-            case 1:
-                for (int i = 0, o = 0; i < dim; i++, o += step) {
-                    a[index + o] *= valuelist[entry * dim + i];
-                }
-                break;
-            default:
-            //System.err.println("CodeBook.decodeves: addmul="+addmul); 
+        case -1:
+            for (int i = 0, o = 0; i < dim; i++, o += step) {
+                a[index + o] = valuelist[entry * dim + i];
+            }
+            break;
+        case 0:
+            for (int i = 0, o = 0; i < dim; i++, o += step) {
+                a[index + o] += valuelist[entry * dim + i];
+            }
+            break;
+        case 1:
+            for (int i = 0, o = 0; i < dim; i++, o += step) {
+                a[index + o] *= valuelist[entry * dim + i];
+            }
+            break;
+        default:
+            // System.err.println("CodeBook.decodeves: addmul="+addmul);
         }
         return (entry);
     }
@@ -284,21 +275,21 @@ class CodeBook {
     int besterror(float[] a, int step, int addmul) {
         int best = best(a, step);
         switch (addmul) {
-            case 0:
-                for (int i = 0, o = 0; i < dim; i++, o += step) {
-                    a[o] -= valuelist[best * dim + i];
+        case 0:
+            for (int i = 0, o = 0; i < dim; i++, o += step) {
+                a[o] -= valuelist[best * dim + i];
+            }
+            break;
+        case 1:
+            for (int i = 0, o = 0; i < dim; i++, o += step) {
+                float val = valuelist[best * dim + i];
+                if (val == 0) {
+                    a[o] = 0;
+                } else {
+                    a[o] /= val;
                 }
-                break;
-            case 1:
-                for (int i = 0, o = 0; i < dim; i++, o += step) {
-                    float val = valuelist[best * dim + i];
-                    if (val == 0) {
-                        a[o] = 0;
-                    } else {
-                        a[o] /= val;
-                    }
-                }
-                break;
+            }
+            break;
         }
         return (best);
     }
@@ -306,7 +297,8 @@ class CodeBook {
     void clear() {
     }
 
-    private static float dist(int el, float[] ref, int index, float[] b, int step) {
+    private static float dist(int el, float[] ref, int index, float[] b,
+            int step) {
         float acc = (float) 0.;
         for (int i = 0; i < el; i++) {
             float val = (ref[index + i] - b[i * step]);
@@ -320,7 +312,6 @@ class CodeBook {
         entries = s.entries;
         dim = s.dim;
         valuelist = s.unquantize();
-
         decode_tree = make_decode_tree();
         if (decode_tree == null) {
             clear();
@@ -329,30 +320,28 @@ class CodeBook {
         return (0);
     }
 
-    // given a list of word lengths, generate a list of codewords.  Works
+    // given a list of word lengths, generate a list of codewords. Works
     // for length ordered or unordered, always assigns the lowest valued
-    // codewords first.  Extended to handle unused entries (length 0)
+    // codewords first. Extended to handle unused entries (length 0)
     static int[] make_words(int[] l, int n) {
         int[] marker = new int[33];
         int[] r = new int[n];
-
         for (int i = 0; i < n; i++) {
             int length = l[i];
             if (length > 0) {
                 int entry = marker[length];
-
                 // when we claim a node for an entry, we also claim the nodes
                 // below it (pruning off the imagined tree that may have dangled
                 // from it) as well as blocking the use of any nodes directly
                 // above for leaves
                 // update ourself
                 if (length < 32 && (entry >>> length) != 0) {
-                    // error condition; the lengths must specify an overpopulated tree
-                    //free(r);
+                    // error condition; the lengths must specify an
+                    // overpopulated tree
+                    // free(r);
                     return (null);
                 }
                 r[i] = entry;
-
                 // Look to see if the next shorter marker points to the node
                 // above. if so, update it and repeat.
                 {
@@ -364,15 +353,15 @@ class CodeBook {
                             } else {
                                 marker[j] = marker[j - 1] << 1;
                             }
-                            break; // invariant says next upper marker would already
+                            break; // invariant says next upper marker would
+                                   // already
                             // have been moved if it was on the same path
                         }
                         marker[j]++;
                     }
                 }
-
                 // prune the tree; the implicit invariant says all the longer
-                // markers were dangling from our just-taken node.  Dangle them
+                // markers were dangling from our just-taken node. Dangle them
                 // from our *new* node.
                 for (int j = length + 1; j < 33; j++) {
                     if ((marker[j] >>> 1) == entry) {
@@ -384,7 +373,6 @@ class CodeBook {
                 }
             }
         }
-
         // bitreverse the words because our bitwise packer/unpacker is LSb
         // endian
         for (int i = 0; i < n; i++) {
@@ -395,23 +383,20 @@ class CodeBook {
             }
             r[i] = temp;
         }
-
         return (r);
     }
 
-    // build the decode helper tree from the codewords 
+    // build the decode helper tree from the codewords
     DecodeAux make_decode_tree() {
         int top = 0;
         DecodeAux t = new DecodeAux();
         int[] ptr0 = t.ptr0 = new int[entries * 2];
         int[] ptr1 = t.ptr1 = new int[entries * 2];
         int[] codelist = make_words(c.lengthlist, c.entries);
-
         if (codelist == null) {
             return (null);
         }
         t.aux = entries * 2;
-
         for (int i = 0; i < entries; i++) {
             if (c.lengthlist[i] > 0) {
                 int ptr = 0;
@@ -430,18 +415,14 @@ class CodeBook {
                         ptr = ptr1[ptr];
                     }
                 }
-
                 if (((codelist[i] >>> j) & 1) == 0) {
                     ptr0[ptr] = -i;
                 } else {
                     ptr1[ptr] = -i;
                 }
-
             }
         }
-
         t.tabn = Util.ilog(entries) - 4;
-
         if (t.tabn < 5) {
             t.tabn = 5;
         }
@@ -459,18 +440,15 @@ class CodeBook {
                 }
             }
             t.tab[i] = p; // -code
-            t.tabl[i] = j; // length 
+            t.tabl[i] = j; // length
         }
-
         return (t);
     }
 
     static class DecodeAux {
-
         int[] tab;
         int[] tabl;
         int tabn;
-
         int[] ptr0;
         int[] ptr1;
         int aux; // number of tree entries
